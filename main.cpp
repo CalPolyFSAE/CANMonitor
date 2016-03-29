@@ -10,15 +10,10 @@
 
 #include <AVRLibrary/arduino/Arduino.h>
 
-#define TEAM FE //Other: FSAE
+#include "DashLCD.h"
 
-#if TEAM==FE
-#include "FEDashLCD.h"
-FEDashLCD dashLCD;
-#else
-#include "FSAEDashLCD.h"
-FSAEDashLCD dashLCD;
-#endif
+
+DashLCD dashLCD;
 
 SIGNAL(TIMER2_OVF_vect) {
 	dashLCD.TIMER2_OVF_INT();
