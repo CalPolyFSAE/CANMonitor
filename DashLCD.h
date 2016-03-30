@@ -125,32 +125,34 @@ public:
 		} else {
 			canMonitor();
 		}
-
+		_delay_ms(100);
 	}
 
 	void CAN_RX_Int(CPFECANLib::MSG *msg, uint8_t mobNum) {
 		resetTimeoutTimer();
 		waitingForCANOverride = false;
 		++msgCount;
+		id = msg->identifier.extended;
+		extended = msg->ide;
 
 		memcpy((void *) dataBuffer, msg->data, 8);
 		RX_CAN(true);
 	}
 
 protected:
-	constexpr uint8_t CAN_TIMER_OVF_COUNT_MAX = 254;
-	constexpr uint8_t CAN_RX_MOB = 0;
+	static constexpr uint8_t CAN_TIMER_OVF_COUNT_MAX = 254;
+	static constexpr uint8_t CAN_RX_MOB = 0;
 
 	// RX All CAN Messages
-	constexpr CPFECANLib::MSG MESSAGE_DEFINITION = { { 0 }, 0, 0, 0, 0 };
-	constexpr CPFECANLib::MSG MESSAGE_MASK = MESSAGE_DEFINITION;
+	static constexpr CPFECANLib::MSG MESSAGE_DEFINITION = { { 0 }, 0, 0, 0, 0 };
+	static constexpr CPFECANLib::MSG MESSAGE_MASK = MESSAGE_DEFINITION;
 
 	volatile uint8_t CAN_OVFCount;
 	volatile bool waitingForCANOverride;
 	FT801IMPL_SPI LCD;
 
 	volatile uint8_t dataBuffer[8];
-	volatile uint16_t id;
+	volatile uint32_t id;
 	volatile bool extended;
 	volatile uint16_t msgCount;
 
@@ -208,7 +210,7 @@ protected:
 		LCD.DLStart();
 
 		LCD.ColorRGB(0xFF, 0xFF, 0xFF);
-		LCD.PrintText(5, 10, 29, 0, "Message Count: %ld", msgCount);
+		LCD.PrintText(5, 10, 29, 0, "Message Count: %u", msgCount);
 		LCD.PrintText(5, 50, 28, 0, "ID: 0x%03lX %s", id, extended ? "(EXT)" : "(STD)");
 		LCD.PrintText(5, 75, 28, 0, "Data: %02X %02X %02X %02X %02X %02X %02X %02X", dataBuffer[0], dataBuffer[1], dataBuffer[2], dataBuffer[3], dataBuffer[4], dataBuffer[5], dataBuffer[6],
 				dataBuffer[7]);
